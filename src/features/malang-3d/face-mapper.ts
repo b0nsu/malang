@@ -1,0 +1,3 @@
+import type { FaceParametersV1 } from '@/domain/face';
+/** Stable GLB morph-target contract; keep model naming at this boundary. */
+export const morphWeights = (face: FaceParametersV1) => ({ brow_left_center_y: face.brows.left.centerY, brow_left_outer_y: face.brows.left.outerY, brow_right_center_y: face.brows.right.centerY, brow_right_outer_y: face.brows.right.outerY, eye_left_open: face.eyes.left.openness, eye_right_open: face.eyes.right.openness, mouth_left_corner_y: face.mouth.leftCornerY, mouth_right_corner_y: face.mouth.rightCornerY, mouth_open: face.mouth.openness, face_width: face.face.width, face_length: face.face.length, face_skew_x: face.face.skewX, face_tilt: face.face.tilt, face_volume: face.face.volume });

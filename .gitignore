@@ -9,3 +9,7 @@
 .omx/tmux-hook.json
 documents/
 reference/
+node_modules/
+dist/
+.expo/
+android/

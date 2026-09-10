@@ -1,0 +1,4 @@
+export const palette = { milk50:'#FBF8F2', milk100:'#F5F2ED', mist400:'#8097B8', mist100:'#DCE5F0', mint300:'#B7D7CF', lavender400:'#A8A0C7', lavender100:'#E9E4F2', peach300:'#E8BEB0', butter300:'#E6D39B', ink900:'#1F2024', ink600:'#69686D', border:'#DED9D1', focus:'#526987', destructive600:'#9C4A4A', destructive100:'#F4E2DE' } as const;
+export const color = { bg:{canvas:palette.milk50,surface:palette.milk100,selected:palette.mist100}, text:{primary:palette.ink900,secondary:palette.ink600}, action:{primary:palette.mist400,primaryPressed:palette.focus,subtle:palette.mint300}, border:{default:palette.border}, focus:{ring:palette.focus}, status:{destructive:palette.destructive600,destructiveSurface:palette.destructive100}, overlay:{scrim:'rgba(31,32,36,0.32)'} } as const;
+export const space = { 1:4,2:8,3:12,4:16,5:20,6:24,8:32 } as const;
+export const radius = { card:20, control:12, full:999 } as const;
