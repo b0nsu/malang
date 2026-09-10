@@ -1,0 +1,11 @@
+.omc/
+.omx/context/
+.omx/logs/
+.omx/metrics.json
+.omx/runtime/
+.omx/state/
+.omx/launch-team.ps1
+.omx/ralph-state.json
+.omx/tmux-hook.json
+documents/
+reference/
