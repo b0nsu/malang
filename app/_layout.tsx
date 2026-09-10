@@ -4,5 +4,5 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 export default function RootLayout() {
-  return <><StatusBar style="dark" /><Stack screenOptions={{ headerShown: false, animation: 'fade' }} /></>;
+  return <><StatusBar style="dark" /><Stack screenOptions={{ headerShown: false, animation: 'default', contentStyle: { backgroundColor: '#FCF9F4' } }} /></>;
 }

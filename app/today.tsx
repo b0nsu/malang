@@ -1,9 +1,8 @@
-import { View, StyleSheet } from 'react-native';
-import { Link } from 'expo-router';
-import { AppText, Button, Card } from '@/design-system/components';
-import { color, space } from '@/design-system/tokens';
-
-export default function TodayScreen() {
-  return <View style={styles.screen}><AppText variant="display">오늘</AppText><Card><AppText variant="body">말랑이를 둘러보고, 마음에 남은 것을 기록할 수 있어요.</AppText><Link href="/entry/emotion" asChild><Button label="오늘 기록하기" /></Link></Card><AppText variant="caption">말랑이의 움직임은 기록으로 남지 않아요.</AppText></View>;
-}
-const styles = StyleSheet.create({ screen: { flex: 1, backgroundColor: color.bg.canvas, padding: space[6], justifyContent: 'center', gap: space[5] } });
+import { Platform, StyleSheet, View } from 'react-native';
+import { router } from 'expo-router';
+import { AppText, BottomTabs, Button, Card, IconButton, Screen } from '@/design-system/components';
+import { color, radius, space } from '@/design-system/tokens';
+import { MalangScene } from '@/features/malang-3d/MalangScene.android';
+import { neutralFace } from '@/domain/face';
+export default function TodayScreen() { return <View style={styles.root}><Screen style={styles.content}><View style={styles.top}><IconButton label="메뉴" icon="☰" onPress={()=>router.push('/settings/data' as never)}/><AppText variant="heading" style={styles.brand}>MALANG</AppText><View style={styles.placeholder}/></View><View style={styles.hero}><AppText variant="title" style={styles.center}>오늘,{`\n`}어떤 하루였나요?</AppText><View style={styles.malang}>{Platform.OS==='web'?<View style={styles.blob}><View style={styles.eyeRow}><View style={styles.eye}/><View style={styles.eye}/></View><View style={styles.mouth}/></View>:<MalangScene face={neutralFace}/>}</View></View><Card style={styles.message}><AppText variant="body" tone="secondary" style={styles.center}>작은 감정도 소중하니까.</AppText><AppText variant="bodySmall" tone="secondary" style={styles.center}>오늘의 마음을 있는 그대로 담아보세요.</AppText></Card><Button label="기록하기  →" onPress={()=>router.push('/entry/new' as never)}/></Screen><BottomTabs active="today" onToday={()=>router.replace('/today' as never)} onRecords={()=>router.push('/records' as never)} onStudio={()=>router.push('/face-studio' as never)}/></View>; }
+const styles=StyleSheet.create({root:{flex:1,backgroundColor:color.bg.canvas},content:{flexGrow:1,justifyContent:'space-between'},top:{flexDirection:'row',alignItems:'center',justifyContent:'space-between'},placeholder:{width:44},brand:{letterSpacing:1.5},hero:{alignItems:'center',gap:space[3]},center:{textAlign:'center'},malang:{height:250,width:'100%',overflow:'hidden',borderRadius:radius.large,backgroundColor:color.bg.muted,alignItems:'center',justifyContent:'center'},message:{paddingVertical:space[4],backgroundColor:'transparent',borderWidth:0,shadowOpacity:0},blob:{width:175,height:145,borderRadius:90,backgroundColor:'#FFFDF9',alignItems:'center',justifyContent:'center',shadowColor:'#9D897C',shadowOpacity:.16,shadowRadius:24,elevation:3},eyeRow:{flexDirection:'row',gap:44,marginTop:8},eye:{height:15,width:12,borderRadius:10,backgroundColor:color.text.primary},mouth:{marginTop:18,width:18,height:8,borderBottomWidth:3,borderColor:color.text.primary,borderRadius:20}});
