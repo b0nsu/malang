@@ -4,6 +4,16 @@ import { neutralFace } from '@/domain/face';
 describe('entry draft face history', () => {
   beforeEach(() => useEntryDraft.getState().reset());
 
+  it('starts a new daily face from a clean neutral history', () => {
+    const abandoned = { ...neutralFace, face: { ...neutralFace.face, width: .7 } };
+    useEntryDraft.getState().setFace(abandoned);
+    useEntryDraft.getState().startFace(neutralFace);
+    expect(useEntryDraft.getState().face).toEqual(neutralFace);
+    expect(useEntryDraft.getState().faceHistory).toEqual([]);
+    useEntryDraft.getState().undoFace();
+    expect(useEntryDraft.getState().face).toEqual(neutralFace);
+  });
+
   it('restores the previous gesture state with undo', () => {
     const changed = { ...neutralFace, face: { ...neutralFace.face, width: .5 } };
     useEntryDraft.getState().setFace(changed);
