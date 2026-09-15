@@ -10,7 +10,7 @@ async function getOrCreateDatabaseKey() {
   const existing = await SecureStore.getItemAsync(DATABASE_KEY_NAME);
   if (existing) return existing;
   const key = Array.from(await getRandomBytesAsync(32), (byte) => byte.toString(16).padStart(2, '0')).join('');
-  await SecureStore.setItemAsync(DATABASE_KEY_NAME, key, { keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY });
+  await SecureStore.setItemAsync(DATABASE_KEY_NAME, key, { keychainAccessible: SecureStore.WHEN_UNLOCKED });
   return key;
 }
 
