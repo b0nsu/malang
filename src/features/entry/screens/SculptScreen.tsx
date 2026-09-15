@@ -55,8 +55,8 @@ export default function SculptScreen() {
         <GestureHandle label="오른쪽 눈썹 중심" hint="위아래로 오른쪽 눈썹 높이를 조절" onStart={begin} onMove={(dx, dy) => update(browRightCenter, dx, dy)} onEnd={finish} onIncrement={() => nudge(browRightCenter, 0, -9)} onDecrement={() => nudge(browRightCenter, 0, 9)} />
         <GestureHandle label="왼쪽 눈썹 끝" hint="위아래로 왼쪽 눈썹 기울기를 조절" onStart={begin} onMove={(dx, dy) => update(browLeftOuter, dx, dy)} onEnd={finish} onIncrement={() => nudge(browLeftOuter, 0, -9)} onDecrement={() => nudge(browLeftOuter, 0, 9)} />
         <GestureHandle label="오른쪽 눈썹 끝" hint="위아래로 오른쪽 눈썹 기울기를 조절" onStart={begin} onMove={(dx, dy) => update(browRightOuter, dx, dy)} onEnd={finish} onIncrement={() => nudge(browRightOuter, 0, -9)} onDecrement={() => nudge(browRightOuter, 0, 9)} />
-        <GestureHandle label="왼쪽 눈" hint="위아래로 뜸, 좌우로 기울기와 크기를 조절" onStart={begin} onMove={(dx, dy) => update(eyeLeft, dx, dy)} onEnd={finish} onIncrement={() => nudge(eyeLeft, 0, -10)} onDecrement={() => nudge(eyeLeft, 0, 10)} />
-        <GestureHandle label="오른쪽 눈" hint="위아래로 뜸, 좌우로 기울기와 크기를 조절" onStart={begin} onMove={(dx, dy) => update(eyeRight, dx, dy)} onEnd={finish} onIncrement={() => nudge(eyeRight, 0, -10)} onDecrement={() => nudge(eyeRight, 0, 10)} />
+        <GestureHandle label="왼쪽 눈" hint="위아래로 뜸과 높이를, 좌우로 기울기와 너비를 조절" onStart={begin} onMove={(dx, dy) => update(eyeLeft, dx, dy)} onEnd={finish} onIncrement={() => nudge(eyeLeft, 0, -10)} onDecrement={() => nudge(eyeLeft, 0, 10)} onMoveLeft={() => nudge(eyeLeft, -12, 0)} onMoveRight={() => nudge(eyeLeft, 12, 0)} />
+        <GestureHandle label="오른쪽 눈" hint="위아래로 뜸과 높이를, 좌우로 기울기와 너비를 조절" onStart={begin} onMove={(dx, dy) => update(eyeRight, dx, dy)} onEnd={finish} onIncrement={() => nudge(eyeRight, 0, -10)} onDecrement={() => nudge(eyeRight, 0, 10)} onMoveLeft={() => nudge(eyeRight, -12, 0)} onMoveRight={() => nudge(eyeRight, 12, 0)} />
         <GestureHandle label="왼쪽 입꼬리" hint="위아래로 왼쪽 입꼬리를 조절" onStart={begin} onMove={(dx, dy) => update(mouthLeft, dx, dy)} onEnd={finish} onIncrement={() => nudge(mouthLeft, 0, -9)} onDecrement={() => nudge(mouthLeft, 0, 9)} />
         <GestureHandle label="오른쪽 입꼬리" hint="위아래로 오른쪽 입꼬리를 조절" onStart={begin} onMove={(dx, dy) => update(mouthRight, dx, dy)} onEnd={finish} onIncrement={() => nudge(mouthRight, 0, -9)} onDecrement={() => nudge(mouthRight, 0, 9)} />
         <GestureHandle label="입 가운데" hint="위아래로 입 벌어짐을 조절" onStart={begin} onMove={(dx, dy) => update(mouthOpen, dx, dy)} onEnd={finish} onIncrement={() => nudge(mouthOpen, 0, -10)} onDecrement={() => nudge(mouthOpen, 0, 10)} />
@@ -74,7 +74,7 @@ export default function SculptScreen() {
   </View>;
 }
 
-function GestureHandle({ label, hint, onStart, onMove, onEnd, onIncrement, onDecrement }: {
+function GestureHandle({ label, hint, onStart, onMove, onEnd, onIncrement, onDecrement, onMoveLeft, onMoveRight }: {
   label: string;
   hint: string;
   onStart: () => void;
@@ -82,22 +82,32 @@ function GestureHandle({ label, hint, onStart, onMove, onEnd, onIncrement, onDec
   onEnd: () => void;
   onIncrement: () => void;
   onDecrement: () => void;
+  onMoveLeft?: () => void;
+  onMoveRight?: () => void;
 }) {
   const origin = useRef<{ x: number; y: number } | null>(null);
   const end = () => {
     origin.current = null;
     onEnd();
   };
+  const accessibilityActions = [
+    { name: 'increment', label: `${label} 올리기` },
+    { name: 'decrement', label: `${label} 내리기` },
+    ...(onMoveLeft ? [{ name: 'moveLeft', label: `${label} 왼쪽으로 조절` }] : []),
+    ...(onMoveRight ? [{ name: 'moveRight', label: `${label} 오른쪽으로 조절` }] : []),
+  ];
 
   return <View
     accessible
     accessibilityRole="adjustable"
     accessibilityLabel={label}
     accessibilityHint={hint}
-    accessibilityActions={[{ name: 'increment', label: `${label} 올리기` }, { name: 'decrement', label: `${label} 내리기` }]}
+    accessibilityActions={accessibilityActions}
     onAccessibilityAction={(event) => {
       if (event.nativeEvent.actionName === 'increment') onIncrement();
       if (event.nativeEvent.actionName === 'decrement') onDecrement();
+      if (event.nativeEvent.actionName === 'moveLeft') onMoveLeft?.();
+      if (event.nativeEvent.actionName === 'moveRight') onMoveRight?.();
     }}
     onStartShouldSetResponder={() => true}
     onMoveShouldSetResponder={() => true}
