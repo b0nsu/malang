@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -36,3 +38,12 @@ jobs:
 
       - name: Bundle iOS and Android
         run: npx expo export --platform ios --platform android --output-dir /tmp/malang-dist
+
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Diff whitespace check
+        run: git diff --check origin/main...HEAD
+
+      - name: Repository clean check
+        run: test -z "$(git status --porcelain)"
