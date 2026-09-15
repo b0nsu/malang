@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { Alert } from 'react-native';
 import Constants from 'expo-constants';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
-import { AppText, Button, Card } from '@/design-system/components';
+import { router } from 'expo-router';
+import { AppText, Button, Card, Screen, ScreenHeader } from '@/design-system/components';
 import { listEntries, replaceEntries } from '@/data/repositories/entries';
 import { createBackup, parseBackup, previewImport } from '@/domain/backup';
-import { color, space } from '@/design-system/tokens';
 import { useAppearance } from '@/features/appearance/store';
 
 const MAX_BACKUP_BYTES = 25 * 1024 * 1024;
@@ -85,14 +85,12 @@ export default function DataSettingsScreen() {
     }
   };
 
-  return <View style={styles.screen}>
-    <AppText variant="title">데이터</AppText>
+  return <Screen>
+    <ScreenHeader title="데이터" back={() => router.back()} />
     <Card>
       <AppText>기록은 이 기기에 저장돼요. 백업 파일에는 기록 내용이 들어갈 수 있어요.</AppText>
       <Button label={busy === 'export' ? '내보내는 중…' : '백업 내보내기'} disabled={busy !== null} onPress={exportBackup} />
       <Button label={busy === 'import' ? '가져오는 중…' : '백업 가져오기'} disabled={busy !== null} variant="subtle" onPress={importBackup} />
     </Card>
-  </View>;
+  </Screen>;
 }
-
-const styles = StyleSheet.create({ screen: { flex: 1, backgroundColor: color.bg.canvas, padding: space[5], gap: space[3] } });

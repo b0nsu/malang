@@ -5,15 +5,28 @@ import { AppText, Button, Card, Screen, ScreenHeader } from '@/design-system/com
 import { useAppearance } from '@/features/appearance/store';
 import { clamp, clampFace, type FaceParametersV1 } from '@/domain/face';
 import { MalangScene } from '@/features/malang-3d/MalangScene';
-import { color, space } from '@/design-system/tokens';
+import { color, layout, space } from '@/design-system/tokens';
 
-const colors = ['#B7D7CF', '#A8A0C7', '#E8BEB0', '#E6D39B'];
+const colors = [
+  { value: '#B7D7CF', label: '소프트 민트' },
+  { value: '#A8A0C7', label: '라벤더' },
+  { value: '#E8BEB0', label: '소프트 피치' },
+  { value: '#E6D39B', label: '버터' },
+] as const;
+const materials = [
+  { value: 'default', label: '말랑' },
+  { value: 'soft', label: '포근 매트' },
+] as const;
 
 export default function FaceStudioScreen() {
   const { face, appearance, setFace, setAppearance } = useAppearance();
   const update = (change: (current: FaceParametersV1) => FaceParametersV1) => setFace(clampFace(change(face)));
   const toggleSprout = () => setAppearance({ ...appearance, decorationIds: appearance.decorationIds.includes('sprout') ? [] : ['sprout'] });
-  return <Screen><ScreenHeader title="말랑이 꾸미기" back={() => router.back()} /><AppText variant="bodySmall" tone="secondary">현재 모습은 이미 쓴 기록을 바꾸지 않아요. 막대를 좌우로 끌어 세밀하게 조절할 수 있어요.</AppText><MalangScene face={face} appearance={appearance} />
+
+  return <Screen>
+    <ScreenHeader title="말랑이 꾸미기" back={() => router.back()} />
+    <AppText variant="bodySmall" tone="secondary">현재 모습은 이미 쓴 기록을 바꾸지 않아요. 막대를 좌우로 끌어 세밀하게 조절할 수 있어요.</AppText>
+    <MalangScene face={face} appearance={appearance} />
     <StudioSection title="표정">
       <FaceControl label="왼쪽 눈썹 높이" value={face.brows.left.centerY} onChange={(value) => update((current) => ({ ...current, brows: { ...current.brows, left: { ...current.brows.left, centerY: value } } }))} />
       <FaceControl label="오른쪽 눈썹 높이" value={face.brows.right.centerY} onChange={(value) => update((current) => ({ ...current, brows: { ...current.brows, right: { ...current.brows.right, centerY: value } } }))} />
@@ -25,18 +38,58 @@ export default function FaceStudioScreen() {
       <FaceControl label="오른쪽 입꼬리" value={face.mouth.rightCornerY} onChange={(value) => update((current) => ({ ...current, mouth: { ...current.mouth, rightCornerY: value } }))} />
       <FaceControl label="입 벌어짐" value={face.mouth.openness} min={0} max={1} onChange={(value) => update((current) => ({ ...current, mouth: { ...current.mouth, openness: value } }))} />
     </StudioSection>
-    <StudioSection title="얼굴 형태">{(['width', 'length', 'skewX', 'tilt', 'volume'] as const).map((axis) => <FaceControl key={axis} label={{ width: '너비', length: '길이', skewX: '좌우 기울기', tilt: '방향', volume: '볼륨' }[axis]} value={face.face[axis]} onChange={(value) => update((current) => ({ ...current, face: { ...current.face, [axis]: value } }))} />)}</StudioSection>
-    <StudioSection title="색과 재질"><AppText variant="caption" tone="secondary">기본 색</AppText><View style={styles.choices}>{colors.map((baseColor) => <Button key={baseColor} label={appearance.baseColor === baseColor ? `${baseColor} 선택됨` : baseColor} variant="subtle" onPress={() => setAppearance({ ...appearance, baseColor })} />)}</View><AppText variant="caption" tone="secondary">부드러운 재질</AppText><View style={styles.choices}>{(['default', 'soft'] as const).map((materialId) => <Button key={materialId} label={appearance.materialId === materialId ? `${materialId} 선택됨` : materialId} variant="subtle" onPress={() => setAppearance({ ...appearance, materialId })} />)}</View></StudioSection>
-    <StudioSection title="장식"><Button label={appearance.decorationIds.includes('sprout') ? '새싹 장식 해제' : '새싹 장식 추가'} variant="subtle" onPress={toggleSprout} /></StudioSection>
+    <StudioSection title="얼굴 형태">
+      {(['width', 'length', 'skewX', 'tilt', 'volume'] as const).map((axis) => <FaceControl
+        key={axis}
+        label={{ width: '너비', length: '길이', skewX: '좌우 비틀림', tilt: '기울기', volume: '볼륨' }[axis]}
+        value={face.face[axis]}
+        onChange={(value) => update((current) => ({ ...current, face: { ...current.face, [axis]: value } }))}
+      />)}
+    </StudioSection>
+    <StudioSection title="색과 재질">
+      <AppText variant="caption" tone="secondary">기본 색</AppText>
+      <View style={styles.choices}>{colors.map(({ value, label }) => <Button key={value} label={appearance.baseColor === value ? `${label} · 선택됨` : label} variant="subtle" onPress={() => setAppearance({ ...appearance, baseColor: value })} />)}</View>
+      <AppText variant="caption" tone="secondary">재질</AppText>
+      <View style={styles.choices}>{materials.map(({ value, label }) => <Button key={value} label={appearance.materialId === value ? `${label} · 선택됨` : label} variant="subtle" onPress={() => setAppearance({ ...appearance, materialId: value })} />)}</View>
+    </StudioSection>
+    <StudioSection title="장식">
+      <Button label={appearance.decorationIds.includes('sprout') ? '새싹 장식 해제' : '새싹 장식 추가'} variant="subtle" onPress={toggleSprout} />
+    </StudioSection>
   </Screen>;
 }
 
-function StudioSection({ title, children }: { title: string; children: React.ReactNode }) { return <Card><AppText variant="heading">{title}</AppText><View style={styles.section}>{children}</View></Card>; }
+function StudioSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return <Card><AppText variant="heading">{title}</AppText><View style={styles.section}>{children}</View></Card>;
+}
 
 function FaceControl({ label, value, onChange, min = -1, max = 1 }: { label: string; value: number; onChange: (value: number) => void; min?: number; max?: number }) {
   const start = useRef<{ x: number; value: number } | null>(null);
   const percent = ((value - min) / (max - min)) * 100;
-  return <View accessible accessibilityRole="adjustable" accessibilityLabel={label} accessibilityValue={{ min, max, now: value }} accessibilityActions={[{ name: 'increment', label: `${label} 늘리기` }, { name: 'decrement', label: `${label} 줄이기` }]} onAccessibilityAction={(event) => onChange(clamp(value + (event.nativeEvent.actionName === 'increment' ? .1 : -.1), min, max))} onStartShouldSetResponder={() => true} onMoveShouldSetResponder={() => true} onResponderGrant={(event) => { start.current = { x: event.nativeEvent.pageX, value }; }} onResponderMove={(event) => { if (start.current) onChange(clamp(start.current.value + (event.nativeEvent.pageX - start.current.x) / 160, min, max)); }} onResponderRelease={() => { start.current = null; }} onResponderTerminate={() => { start.current = null; }} style={styles.control}><View style={styles.controlHeading}><AppText variant="label">{label}</AppText><AppText variant="caption" tone="secondary">{value.toFixed(1)}</AppText></View><View style={styles.track}><View style={[styles.fill, { width: `${percent}%` }]} /></View></View>;
+  return <View
+    accessible
+    accessibilityRole="adjustable"
+    accessibilityLabel={label}
+    accessibilityValue={{ min, max, now: value }}
+    accessibilityActions={[{ name: 'increment', label: `${label} 늘리기` }, { name: 'decrement', label: `${label} 줄이기` }]}
+    onAccessibilityAction={(event) => onChange(clamp(value + (event.nativeEvent.actionName === 'increment' ? 0.1 : -0.1), min, max))}
+    onStartShouldSetResponder={() => true}
+    onMoveShouldSetResponder={() => true}
+    onResponderGrant={(event) => { start.current = { x: event.nativeEvent.pageX, value }; }}
+    onResponderMove={(event) => { if (start.current) onChange(clamp(start.current.value + (event.nativeEvent.pageX - start.current.x) / 160, min, max)); }}
+    onResponderRelease={() => { start.current = null; }}
+    onResponderTerminate={() => { start.current = null; }}
+    style={styles.control}
+  >
+    <View style={styles.controlHeading}><AppText variant="label">{label}</AppText><AppText variant="caption" tone="secondary">{value.toFixed(1)}</AppText></View>
+    <View style={styles.track}><View style={[styles.fill, { width: `${percent}%` }]} /></View>
+  </View>;
 }
 
-const styles = StyleSheet.create({ section: { gap: space[3], marginTop: space[3] }, choices: { flexDirection: 'row', flexWrap: 'wrap', gap: space[2] }, control: { minHeight: 44, gap: space[1], justifyContent: 'center' }, controlHeading: { flexDirection: 'row', justifyContent: 'space-between' }, track: { height: 8, borderRadius: 99, backgroundColor: color.bg.selected, overflow: 'hidden' }, fill: { height: '100%', borderRadius: 99, backgroundColor: color.action.primary } });
+const styles = StyleSheet.create({
+  section: { gap: space[3], marginTop: space[3] },
+  choices: { flexDirection: 'row', flexWrap: 'wrap', gap: space[2] },
+  control: { minHeight: layout.hitTarget, gap: space[1], justifyContent: 'center' },
+  controlHeading: { flexDirection: 'row', justifyContent: 'space-between' },
+  track: { height: 8, borderRadius: 99, backgroundColor: color.bg.selected, overflow: 'hidden' },
+  fill: { height: '100%', borderRadius: 99, backgroundColor: color.action.primary },
+});
