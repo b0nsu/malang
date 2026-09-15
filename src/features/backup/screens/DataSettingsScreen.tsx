@@ -31,7 +31,9 @@ async function readBackupFile(uri: string) {
 }
 
 export default function DataSettingsScreen() {
+  const face = useAppearance((state) => state.face);
   const appearance = useAppearance((state) => state.appearance);
+  const setFace = useAppearance((state) => state.setFace);
   const setAppearance = useAppearance((state) => state.setAppearance);
   const [busy, setBusy] = useState<'export' | 'import' | null>(null);
 
@@ -41,7 +43,7 @@ export default function DataSettingsScreen() {
     try {
       if (!(await Sharing.isAvailableAsync())) throw new Error('Sharing is unavailable.');
       const appVersion = Constants.expoConfig?.version ?? 'unknown';
-      const backup = createBackup(await listEntries(), appearance, appVersion);
+      const backup = createBackup(await listEntries(), appearance, appVersion, face);
       const date = new Date().toISOString().slice(0, 10);
       const uri = `${FileSystem.cacheDirectory}malang-backup-${date}.malang.json`;
       await FileSystem.writeAsStringAsync(uri, JSON.stringify(backup));
@@ -71,9 +73,10 @@ export default function DataSettingsScreen() {
 
       const replaceDates = policy === 'replace' ? new Set(preview.collisions.map((entry) => entry.date)) : new Set<string>();
       await replaceEntries(backup.entries, replaceDates);
+      setFace(backup.currentFace);
       setAppearance(backup.appearance);
       const replacedCount = policy === 'replace' ? preview.collisions.length : 0;
-      Alert.alert('가져왔어요.', `새 기록 ${preview.additions.length}개${replacedCount ? `, 교체한 기록 ${replacedCount}개` : ''}와 현재 외형을 불러왔어요.`);
+      Alert.alert('가져왔어요.', `새 기록 ${preview.additions.length}개${replacedCount ? `, 교체한 기록 ${replacedCount}개` : ''}와 현재 말랑이 외형을 불러왔어요.`);
     } catch (error) {
       const tooLarge = error instanceof Error && error.message.includes('too large');
       Alert.alert(
@@ -88,7 +91,7 @@ export default function DataSettingsScreen() {
   return <Screen>
     <ScreenHeader title="데이터" back={() => router.back()} />
     <Card>
-      <AppText>기록은 이 기기에 저장돼요. 백업 파일에는 기록 내용이 들어갈 수 있어요.</AppText>
+      <AppText>기록과 현재 말랑이 외형은 이 기기에 저장돼요. 백업 파일에는 기록 내용과 외형 정보가 들어갈 수 있어요.</AppText>
       <Button label={busy === 'export' ? '내보내는 중…' : '백업 내보내기'} disabled={busy !== null} onPress={exportBackup} />
       <Button label={busy === 'import' ? '가져오는 중…' : '백업 가져오기'} disabled={busy !== null} variant="subtle" onPress={importBackup} />
     </Card>
