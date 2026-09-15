@@ -5,12 +5,14 @@ import { AppText, Button, Card } from '@/design-system/components';
 import { color, layout, space } from '@/design-system/tokens';
 import { MalangScene } from '@/features/malang-3d/MalangScene';
 import { useEntryDraft } from '@/features/entry-draft/store';
+import { useAppearance } from '@/features/appearance/store';
 import { clampFace, type FaceParametersV1 } from '@/domain/face';
 
 type FaceTransform = (start: FaceParametersV1, dx: number, dy: number) => FaceParametersV1;
 
 export default function SculptScreen() {
   const { face, previewFace, commitFaceEdit, undoFace, resetFace, faceHistory } = useEntryDraft();
+  const appearance = useAppearance((state) => state.appearance);
   const gestureStart = useRef(face);
   const gestureChanged = useRef(false);
 
@@ -47,7 +49,7 @@ export default function SculptScreen() {
 
   return <View style={styles.screen}>
     <AppText variant="title">표정 빚기</AppText>
-    <MalangScene face={face} />
+    <MalangScene face={face} appearance={appearance} />
     <Card>
       <AppText variant="bodySmall">표시된 조절점을 손가락으로 직접 움직여 보세요.</AppText>
       <View style={styles.board} accessibilityLabel="표정 직접 조절 영역">
