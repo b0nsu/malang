@@ -25,4 +25,31 @@ describe('web entry repository', () => {
     await replaceEntries([replacement], new Set(['2026-09-11']));
     expect((await listEntries()).find((entry) => entry.date === '2026-09-11')?.emotionId).toBe('emotion-03');
   });
+
+  it('keeps a saved face snapshot immutable from later source-object changes', async () => {
+    const mutableSnapshot = {
+      version: 1 as const,
+      parameters: { ...neutralFace, face: { ...neutralFace.face, width: .4 } },
+      appearance: { baseColor: '#B7D7CF', materialId: 'default', decorationIds: ['sprout'] },
+    };
+    await saveEntry({ date: '2026-09-12', emotionId: 'emotion-04', value: null, note: null }, mutableSnapshot, metadata);
+    mutableSnapshot.parameters.face.width = -.8;
+    mutableSnapshot.appearance.baseColor = '#E8BEB0';
+    mutableSnapshot.appearance.decorationIds.length = 0;
+
+    const saved = await findEntry('2026-09-12');
+    expect(saved?.faceSnapshot.parameters.face.width).toBe(.4);
+    expect(saved?.faceSnapshot.appearance).toEqual({ baseColor: '#B7D7CF', materialId: 'default', decorationIds: ['sprout'] });
+  });
+
+  it('does not let a retrieved record mutate the stored snapshot', async () => {
+    const firstRead = await findEntry('2026-09-12');
+    if (!firstRead) throw new Error('fixture missing');
+    firstRead.faceSnapshot.parameters.face.width = -.3;
+    firstRead.faceSnapshot.appearance.decorationIds.length = 0;
+
+    const secondRead = await findEntry('2026-09-12');
+    expect(secondRead?.faceSnapshot.parameters.face.width).toBe(.4);
+    expect(secondRead?.faceSnapshot.appearance.decorationIds).toEqual(['sprout']);
+  });
 });
