@@ -8,7 +8,7 @@ import { useEntryDraft } from '@/features/entry-draft/store';
 import { findEntry } from '@/data/repositories/entries';
 
 export default function NewEntryScreen() {
-  const { date, setDate, setFace } = useEntryDraft();
+  const { date, setDate, startFace } = useEntryDraft();
   const [checking, setChecking] = useState(false);
 
   const proceed = async () => {
@@ -21,9 +21,10 @@ export default function NewEntryScreen() {
         Alert.alert('같은 날짜의 기록이 있어요.', '기존 기록을 이어서 볼게요.');
         return router.replace(`/entry/${date}` as never);
       }
-      // A daily expression is always a new, neutral canvas. Current appearance
-      // remains independent and is serialized separately when the entry saves.
-      setFace(neutralFace);
+      // A daily expression is always a new, neutral canvas with no undo path
+      // back into an abandoned or previous record. Current appearance remains
+      // independent and is serialized separately when the entry saves.
+      startFace(neutralFace);
       router.push('/entry/emotion');
     } catch {
       Alert.alert('기록 날짜를 확인하지 못했어요.', '입력한 날짜는 그대로 두었어요. 잠시 후 다시 시도해 주세요.');
