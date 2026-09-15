@@ -84,7 +84,7 @@ function SceneContents({ face, appearance }: { face: FaceParametersV1; appearanc
         <ModelEffects face={face} appearance={appearance} model={model} />
       </ModelRenderer>
     </FilamentView>
-    {model.state === 'loading' ? <View pointerEvents="none" style={styles.loading}><StaticMalang appearance={appearance} /></View> : null}
+    {model.state === 'loading' ? <View pointerEvents="none" style={styles.loading}><StaticMalang appearance={appearance} showDecoration={false} /></View> : null}
   </View>;
 }
 
@@ -105,7 +105,7 @@ class FilamentErrorBoundary extends Component<{ fallback: ReactNode; children: R
 }
 
 export function MalangScene({ face, appearance = defaultAppearance }: { face: FaceParametersV1; appearance?: Appearance }) {
-  const fallback = <StaticMalang appearance={appearance} />;
+  const fallback = <StaticMalang appearance={appearance} showDecoration={false} />;
   return <View accessibilityLabel="말랑이 미리보기" style={styles.container}>
     <FilamentErrorBoundary fallback={fallback}>
       <FilamentScene><SceneContents face={face} appearance={appearance} /></FilamentScene>
