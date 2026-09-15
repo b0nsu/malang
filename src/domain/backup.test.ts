@@ -1,4 +1,4 @@
-import { checksum, createBackup, parseBackup, previewImport } from './backup';
+import { BACKUP_FORMAT, BACKUP_SCHEMA_VERSION, checksum, createBackup, parseBackup, previewImport } from './backup';
 import { neutralFace } from './face';
 import type { DailyEntry } from './entry';
 
@@ -40,9 +40,11 @@ describe('backup contract', () => {
   });
 
   it('rejects duplicate dates before restore can replace local records', () => {
+    const backup = createBackup([entry], entry.faceSnapshot.appearance);
     const duplicate = { ...entry, emotionId: 'another-emotion' };
-    const backup = createBackup([entry, duplicate], entry.faceSnapshot.appearance);
-    expect(() => parseBackup(backup)).toThrow(/duplicate date/i);
+    const malformed = { ...backup, entries: [entry, duplicate] };
+    const { checksum: _ignored, ...payload } = malformed;
+    expect(() => parseBackup({ ...malformed, checksum: checksum(payload) })).toThrow(/duplicate date/i);
   });
 
   it('rejects malformed face parameters even when the checksum is valid', () => {
@@ -61,5 +63,19 @@ describe('backup contract', () => {
     const { checksum: _ignored, ...payload } = malformed;
     malformed.checksum = checksum(payload);
     expect(() => parseBackup(malformed)).toThrow();
+  });
+
+  it('migrates existing schema-v1 backups without changing records', () => {
+    const v1Payload = {
+      schemaVersion: 1 as const,
+      exportedAt: '2026-01-01T00:00:00.000Z',
+      appVersion: '0.1.0',
+      appearance: entry.faceSnapshot.appearance,
+      entries: [entry],
+    };
+    const migrated = parseBackup({ ...v1Payload, checksum: checksum(v1Payload) });
+    expect(migrated.format).toBe(BACKUP_FORMAT);
+    expect(migrated.schemaVersion).toBe(BACKUP_SCHEMA_VERSION);
+    expect(migrated.entries).toEqual([entry]);
   });
 });
