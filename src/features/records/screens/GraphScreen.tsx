@@ -6,7 +6,7 @@ import { AppText, Button, Card, Screen, ScreenHeader } from '@/design-system/com
 import { listEntries } from '@/data/repositories/entries';
 import type { DailyEntry } from '@/domain/entry';
 import { buildGraphSegments, filterEntriesByRange, type GraphRange } from '@/domain/graph';
-import { color, space } from '@/design-system/tokens';
+import { color, layout, space } from '@/design-system/tokens';
 
 const height = 200;
 const ranges: Array<[GraphRange, string]> = [['week', '주'], ['month', '월'], ['year', '년'], ['all', '전체']];
@@ -16,7 +16,8 @@ export default function GraphScreen() {
   const [range, setRange] = useState<GraphRange>('all');
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const { width: windowWidth } = useWindowDimensions();
-  const width = Math.max(280, windowWidth - space[5] * 4);
+  const contentWidth = Math.min(windowWidth, layout.contentMaxWidth);
+  const width = Math.max(200, contentWidth - layout.screenHorizontal * 2 - space[5] * 2);
 
   useEffect(() => {
     let active = true;
