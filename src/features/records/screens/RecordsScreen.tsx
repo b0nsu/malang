@@ -26,7 +26,7 @@ export default function RecordsScreen() {
   return <Screen>
     <AppText variant="title">기록</AppText>
     <Button label="그래프로 보기" onPress={() => router.push('/records/graph' as never)} />
-    {status === 'loading' ? <Card><AppText accessibilityRole="text">기록을 불러오는 중이에요.</AppText></Card> : null}
+    {status === 'loading' ? <Card><AppText>기록을 불러오는 중이에요.</AppText></Card> : null}
     {status === 'error' ? <Card>
       <AppText>기록을 불러오지 못했어요.</AppText>
       <AppText variant="bodySmall" tone="secondary">기기에 저장된 기록은 변경하지 않았어요.</AppText>
