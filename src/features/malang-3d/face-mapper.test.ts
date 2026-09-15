@@ -27,8 +27,12 @@ describe('GLB morph mapper', () => {
         right: { ...neutralFace.eyes.right, openness: .8, tilt: -.4 },
       },
     };
-    expect(morphWeightsForEntity('Eye_L', face)).toMatchObject({ Eye_Close: .8, Eye_Tilt_Up: .5, Eye_Tilt_Down: 0 });
-    expect(morphWeightsForEntity('Eye_R', face)).toMatchObject({ Eye_Close: .2, Eye_Tilt_Up: 0, Eye_Tilt_Down: .4 });
+    const left = morphWeightsForEntity('Eye_L', face);
+    const right = morphWeightsForEntity('Eye_R', face);
+    expect(left).toMatchObject({ Eye_Tilt_Up: .5, Eye_Tilt_Down: 0 });
+    expect(left.Eye_Close).toBeCloseTo(.8, 10);
+    expect(right).toMatchObject({ Eye_Tilt_Up: 0, Eye_Tilt_Down: .4 });
+    expect(right.Eye_Close).toBeCloseTo(.2, 10);
   });
 
   it('keeps left and right brow controls independent', () => {
