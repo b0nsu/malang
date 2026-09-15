@@ -1,7 +1,7 @@
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { AppText, Button, Card, Screen, ScreenHeader } from '@/design-system/components';
+import { AppInput, AppText, Button, Card, Screen, ScreenHeader } from '@/design-system/components';
 import { useAppearance } from '@/features/appearance/store';
 import { clamp, clampFace, type FaceParametersV1 } from '@/domain/face';
 import { MalangScene } from '@/features/malang-3d/MalangScene';
@@ -17,23 +17,40 @@ const materials = [
   { value: 'default', label: '말랑' },
   { value: 'soft', label: '포근 매트' },
 ] as const;
+const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
 
 export default function FaceStudioScreen() {
   const { face, appearance, setFace, setAppearance } = useAppearance();
+  const [colorDraft, setColorDraft] = useState(appearance.baseColor);
   const update = (change: (current: FaceParametersV1) => FaceParametersV1) => setFace(clampFace(change(face)));
   const toggleSprout = () => setAppearance({ ...appearance, decorationIds: appearance.decorationIds.includes('sprout') ? [] : ['sprout'] });
+
+  useEffect(() => {
+    setColorDraft(appearance.baseColor);
+  }, [appearance.baseColor]);
+
+  const changeCustomColor = (value: string) => {
+    setColorDraft(value);
+    if (HEX_COLOR.test(value)) setAppearance({ ...appearance, baseColor: value.toUpperCase() });
+  };
 
   return <Screen>
     <ScreenHeader title="말랑이 꾸미기" back={() => router.back()} />
     <AppText variant="bodySmall" tone="secondary">현재 모습은 이미 쓴 기록을 바꾸지 않아요. 막대를 좌우로 끌어 세밀하게 조절할 수 있어요.</AppText>
     <MalangScene face={face} appearance={appearance} />
     <StudioSection title="표정">
-      <FaceControl label="왼쪽 눈썹 높이" value={face.brows.left.centerY} onChange={(value) => update((current) => ({ ...current, brows: { ...current.brows, left: { ...current.brows.left, centerY: value } } }))} />
-      <FaceControl label="오른쪽 눈썹 높이" value={face.brows.right.centerY} onChange={(value) => update((current) => ({ ...current, brows: { ...current.brows, right: { ...current.brows.right, centerY: value } } }))} />
-      <FaceControl label="왼쪽 눈 크기" value={face.eyes.left.scaleX} min={0} max={2} onChange={(value) => update((current) => ({ ...current, eyes: { ...current.eyes, left: { ...current.eyes.left, scaleX: value, scaleY: value } } }))} />
-      <FaceControl label="오른쪽 눈 크기" value={face.eyes.right.scaleX} min={0} max={2} onChange={(value) => update((current) => ({ ...current, eyes: { ...current.eyes, right: { ...current.eyes.right, scaleX: value, scaleY: value } } }))} />
+      <FaceControl label="왼쪽 눈썹 중심 높이" value={face.brows.left.centerY} onChange={(value) => update((current) => ({ ...current, brows: { ...current.brows, left: { ...current.brows.left, centerY: value } } }))} />
+      <FaceControl label="왼쪽 눈썹 끝 높이" value={face.brows.left.outerY} onChange={(value) => update((current) => ({ ...current, brows: { ...current.brows, left: { ...current.brows.left, outerY: value } } }))} />
+      <FaceControl label="오른쪽 눈썹 중심 높이" value={face.brows.right.centerY} onChange={(value) => update((current) => ({ ...current, brows: { ...current.brows, right: { ...current.brows.right, centerY: value } } }))} />
+      <FaceControl label="오른쪽 눈썹 끝 높이" value={face.brows.right.outerY} onChange={(value) => update((current) => ({ ...current, brows: { ...current.brows, right: { ...current.brows.right, outerY: value } } }))} />
       <FaceControl label="왼쪽 눈 뜸" value={face.eyes.left.openness} min={0} max={1} onChange={(value) => update((current) => ({ ...current, eyes: { ...current.eyes, left: { ...current.eyes.left, openness: value } } }))} />
+      <FaceControl label="왼쪽 눈 기울기" value={face.eyes.left.tilt} onChange={(value) => update((current) => ({ ...current, eyes: { ...current.eyes, left: { ...current.eyes.left, tilt: value } } }))} />
+      <FaceControl label="왼쪽 눈 너비" value={face.eyes.left.scaleX} min={0} max={2} onChange={(value) => update((current) => ({ ...current, eyes: { ...current.eyes, left: { ...current.eyes.left, scaleX: value } } }))} />
+      <FaceControl label="왼쪽 눈 높이" value={face.eyes.left.scaleY} min={0} max={2} onChange={(value) => update((current) => ({ ...current, eyes: { ...current.eyes, left: { ...current.eyes.left, scaleY: value } } }))} />
       <FaceControl label="오른쪽 눈 뜸" value={face.eyes.right.openness} min={0} max={1} onChange={(value) => update((current) => ({ ...current, eyes: { ...current.eyes, right: { ...current.eyes.right, openness: value } } }))} />
+      <FaceControl label="오른쪽 눈 기울기" value={face.eyes.right.tilt} onChange={(value) => update((current) => ({ ...current, eyes: { ...current.eyes, right: { ...current.eyes.right, tilt: value } } }))} />
+      <FaceControl label="오른쪽 눈 너비" value={face.eyes.right.scaleX} min={0} max={2} onChange={(value) => update((current) => ({ ...current, eyes: { ...current.eyes, right: { ...current.eyes.right, scaleX: value } } }))} />
+      <FaceControl label="오른쪽 눈 높이" value={face.eyes.right.scaleY} min={0} max={2} onChange={(value) => update((current) => ({ ...current, eyes: { ...current.eyes, right: { ...current.eyes.right, scaleY: value } } }))} />
       <FaceControl label="왼쪽 입꼬리" value={face.mouth.leftCornerY} onChange={(value) => update((current) => ({ ...current, mouth: { ...current.mouth, leftCornerY: value } }))} />
       <FaceControl label="오른쪽 입꼬리" value={face.mouth.rightCornerY} onChange={(value) => update((current) => ({ ...current, mouth: { ...current.mouth, rightCornerY: value } }))} />
       <FaceControl label="입 벌어짐" value={face.mouth.openness} min={0} max={1} onChange={(value) => update((current) => ({ ...current, mouth: { ...current.mouth, openness: value } }))} />
@@ -49,6 +66,10 @@ export default function FaceStudioScreen() {
     <StudioSection title="색과 재질">
       <AppText variant="caption" tone="secondary">기본 색</AppText>
       <View style={styles.choices}>{colors.map(({ value, label }) => <Button key={value} label={appearance.baseColor === value ? `${label} · 선택됨` : label} variant="subtle" onPress={() => setAppearance({ ...appearance, baseColor: value })} />)}</View>
+      <View style={styles.customColor}>
+        <AppInput label="직접 색상" value={colorDraft} onChangeText={changeCustomColor} maxLength={7} placeholder="#B7D7CF" />
+        <AppText variant="caption" tone={HEX_COLOR.test(colorDraft) ? 'secondary' : 'tertiary'}>6자리 HEX 색상(예: #B7D7CF)을 입력할 수 있어요.</AppText>
+      </View>
       <AppText variant="caption" tone="secondary">재질</AppText>
       <View style={styles.choices}>{materials.map(({ value, label }) => <Button key={value} label={appearance.materialId === value ? `${label} · 선택됨` : label} variant="subtle" onPress={() => setAppearance({ ...appearance, materialId: value })} />)}</View>
     </StudioSection>
@@ -88,6 +109,7 @@ function FaceControl({ label, value, onChange, min = -1, max = 1 }: { label: str
 const styles = StyleSheet.create({
   section: { gap: space[3], marginTop: space[3] },
   choices: { flexDirection: 'row', flexWrap: 'wrap', gap: space[2] },
+  customColor: { gap: space[1] },
   control: { minHeight: layout.hitTarget, gap: space[1], justifyContent: 'center' },
   controlHeading: { flexDirection: 'row', justifyContent: 'space-between' },
   track: { height: 8, borderRadius: 99, backgroundColor: color.bg.selected, overflow: 'hidden' },
