@@ -1,0 +1,72 @@
+name: Native Build
+
+on:
+  push:
+    branches:
+      - feat/release-hardening-v3
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.1
+          cache: npm
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Android project
+        run: CI=1 npx expo prebuild --platform android --clean --no-install
+
+      - name: Build Android debug APK
+        working-directory: android
+        run: ./gradlew :app:assembleDebug --no-daemon
+
+  ios:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.1
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate iOS project
+        run: CI=1 npx expo prebuild --platform ios --clean --no-install
+
+      - name: Install CocoaPods
+        working-directory: ios
+        run: pod install
+
+      - name: Build iOS simulator app
+        run: xcodebuild -workspace ios/MALANG.xcworkspace -scheme MALANG -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath "$RUNNER_TEMP/malang-derived" CODE_SIGNING_ALLOWED=NO build

@@ -1,4 +1,5 @@
 import type { DailyEntry } from './entry';
+import { localDateString } from './entry';
 
 export type GraphPoint = Pick<DailyEntry, 'date' | 'value'>;
 export type GraphSegment = GraphPoint[];
@@ -6,12 +7,12 @@ export type GraphRange = 'week' | 'month' | 'year' | 'all';
 
 export function filterEntriesByRange(entries: DailyEntry[], range: GraphRange, today = new Date()): DailyEntry[] {
   if (range === 'all') return entries;
-  const start = new Date(today);
+  let start = new Date(today);
   if (range === 'week') start.setDate(start.getDate() - 6);
-  if (range === 'month') start.setMonth(start.getMonth() - 1);
-  if (range === 'year') start.setFullYear(start.getFullYear() - 1);
-  const startDate = start.toISOString().slice(0, 10);
-  const endDate = today.toISOString().slice(0, 10);
+  if (range === 'month') start = shiftMonthsClamped(start, -1);
+  if (range === 'year') start = shiftYearsClamped(start, -1);
+  const startDate = localDateString(start);
+  const endDate = localDateString(today);
   return entries.filter((entry) => entry.date >= startDate && entry.date <= endDate);
 }
 
@@ -34,6 +35,28 @@ export function buildGraphSegments(entries: DailyEntry[]): GraphSegment[] {
   }
   if (current.length) segments.push(current);
   return segments;
+}
+
+function shiftMonthsClamped(date: Date, months: number) {
+  const result = new Date(date);
+  const day = result.getDate();
+  result.setDate(1);
+  result.setMonth(result.getMonth() + months);
+  result.setDate(Math.min(day, daysInMonth(result.getFullYear(), result.getMonth())));
+  return result;
+}
+
+function shiftYearsClamped(date: Date, years: number) {
+  const result = new Date(date);
+  const day = result.getDate();
+  result.setDate(1);
+  result.setFullYear(result.getFullYear() + years);
+  result.setDate(Math.min(day, daysInMonth(result.getFullYear(), result.getMonth())));
+  return result;
+}
+
+function daysInMonth(year: number, month: number) {
+  return new Date(year, month + 1, 0).getDate();
 }
 
 function dayDistance(a: string, b: string) {

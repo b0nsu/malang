@@ -20,7 +20,8 @@
       "bundleIdentifier": "com.malang.app"
     },
     "android": {
-      "package": "com.malang.app"
+      "package": "com.malang.app",
+      "allowBackup": false
     }
   }
 }
