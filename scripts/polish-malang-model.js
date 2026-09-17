@@ -8,7 +8,6 @@ const path = require('path');
 
 const modelPaths = [
   'assets/models/malang-neutral-v1.glb',
-  'dist/assets/assets/models/malang-neutral-v1.3c4999e0fab88248689fc5b285f4d6b7.glb',
 ].map((file) => path.resolve(__dirname, '..', file));
 
 function readGlb(file) {
@@ -64,11 +63,10 @@ function polish(file) {
   byName.Mouth.scale = [0.88, 0.9, 1];
   byName.Blush_L.scale = [1.08, 0.86, 1];
   byName.Blush_R.scale = [1.08, 0.86, 1];
-  // The reference's resting face is brow-free and has only a suggestion of a smile.
-  byName.Brow_L.scale = [0.001, 0.001, 0.001];
-  byName.Brow_R.scale = [0.001, 0.001, 0.001];
-  json.meshes[0].weights = [0, 0, 0.28];
-  json.meshes[3].weights = [0.55, 0, 0, 0, 0];
+  byName.Brow_L.scale = [1, 1, 1];
+  byName.Brow_R.scale = [1, 1, 1];
+  json.meshes[0].weights = [0, 0, 0];
+  json.meshes[3].weights = [0, 0, 0, 0, 0];
 
   const [body, eye, mouth, brow, blush] = json.materials;
   body.name = 'MAT_Body_WarmPorcelain';

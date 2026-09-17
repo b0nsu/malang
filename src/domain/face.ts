@@ -1,3 +1,18 @@
+import { z } from 'zod';
+
+const signedParameter = z.number().finite().min(-1).max(1);
+const opennessParameter = z.number().finite().min(0).max(1);
+const scaleParameter = z.number().finite().min(0).max(2);
+const browSchema = z.object({ centerY: signedParameter, outerY: signedParameter });
+const eyeSchema = z.object({ openness: opennessParameter, tilt: signedParameter, scaleX: scaleParameter, scaleY: scaleParameter });
+export const faceParametersSchema = z.object({
+  version: z.literal(1),
+  brows: z.object({ left: browSchema, right: browSchema }),
+  eyes: z.object({ left: eyeSchema, right: eyeSchema }),
+  mouth: z.object({ leftCornerY: signedParameter, rightCornerY: signedParameter, openness: opennessParameter }),
+  face: z.object({ width: signedParameter, length: signedParameter, skewX: signedParameter, tilt: signedParameter, volume: signedParameter }),
+});
+
 export type FaceParametersV1 = { version:1; brows:{left:{centerY:number;outerY:number};right:{centerY:number;outerY:number}}; eyes:{left:{openness:number;tilt:number;scaleX:number;scaleY:number};right:{openness:number;tilt:number;scaleX:number;scaleY:number}}; mouth:{leftCornerY:number;rightCornerY:number;openness:number}; face:{width:number;length:number;skewX:number;tilt:number;volume:number} };
 export const neutralFace: FaceParametersV1 = {version:1,brows:{left:{centerY:0,outerY:0},right:{centerY:0,outerY:0}},eyes:{left:{openness:1,tilt:0,scaleX:1,scaleY:1},right:{openness:1,tilt:0,scaleX:1,scaleY:1}},mouth:{leftCornerY:0,rightCornerY:0,openness:0},face:{width:0,length:0,skewX:0,tilt:0,volume:0}};
 export const clamp = (value:number,min=-1,max=1) => Math.min(max,Math.max(min,value));
