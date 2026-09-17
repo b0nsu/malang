@@ -1,4 +1,4 @@
-import type { DailyEntry } from './entry';
+import { localDateString, type DailyEntry } from './entry';
 
 export type GraphPoint = Pick<DailyEntry, 'date' | 'value'>;
 export type GraphSegment = GraphPoint[];
@@ -6,12 +6,18 @@ export type GraphRange = 'week' | 'month' | 'year' | 'all';
 
 export function filterEntriesByRange(entries: DailyEntry[], range: GraphRange, today = new Date()): DailyEntry[] {
   if (range === 'all') return entries;
-  const start = new Date(today);
+  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12);
   if (range === 'week') start.setDate(start.getDate() - 6);
-  if (range === 'month') start.setMonth(start.getMonth() - 1);
-  if (range === 'year') start.setFullYear(start.getFullYear() - 1);
-  const startDate = start.toISOString().slice(0, 10);
-  const endDate = today.toISOString().slice(0, 10);
+  if (range === 'month' || range === 'year') {
+    const day = start.getDate();
+    start.setDate(1);
+    if (range === 'month') start.setMonth(start.getMonth() - 1);
+    else start.setFullYear(start.getFullYear() - 1);
+    const lastDay = new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate();
+    start.setDate(Math.min(day, lastDay));
+  }
+  const startDate = localDateString(start);
+  const endDate = localDateString(today);
   return entries.filter((entry) => entry.date >= startDate && entry.date <= endDate);
 }
 
