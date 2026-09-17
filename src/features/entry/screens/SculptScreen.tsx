@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { AppText, Button, Card } from '@/design-system/components';
+import { AppText, Button, Card, Screen, ScreenHeader } from '@/design-system/components';
 import { color, layout, space } from '@/design-system/tokens';
 import { MalangScene } from '@/features/malang-3d/MalangScene';
 import { useEntryDraft } from '@/features/entry-draft/store';
@@ -47,8 +47,8 @@ export default function SculptScreen() {
   const mouthRight: FaceTransform = (start, _dx, dy) => ({ ...start, mouth: { ...start.mouth, rightCornerY: start.mouth.rightCornerY - dy / 90 } });
   const mouthOpen: FaceTransform = (start, _dx, dy) => ({ ...start, mouth: { ...start.mouth, openness: start.mouth.openness - dy / 100 } });
 
-  return <View style={styles.screen}>
-    <AppText variant="title">표정 빚기</AppText>
+  return <Screen>
+    <ScreenHeader title="표정 빚기" back={() => router.back()} />
     <MalangScene face={face} appearance={appearance} />
     <Card>
       <AppText variant="bodySmall">표시된 조절점을 손가락으로 직접 움직여 보세요.</AppText>
@@ -73,7 +73,7 @@ export default function SculptScreen() {
       <Button label="건너뛰기" variant="subtle" onPress={() => router.replace('/entry/details' as never)} />
       <Button label="다음" onPress={() => router.replace('/entry/details' as never)} />
     </View>
-  </View>;
+  </Screen>;
 }
 
 function GestureHandle({ label, hint, onStart, onMove, onEnd, onIncrement, onDecrement, onMoveLeft, onMoveRight }: {
@@ -129,7 +129,6 @@ function GestureHandle({ label, hint, onStart, onMove, onEnd, onIncrement, onDec
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: color.bg.canvas, padding: space[5], gap: space[4] },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: space[2] },
   board: { flexDirection: 'row', flexWrap: 'wrap', gap: space[2] },
   handle: { minHeight: layout.hitTarget, flexGrow: 1, minWidth: '28%', justifyContent: 'center', alignItems: 'center', borderRadius: 14, backgroundColor: color.bg.selected, paddingHorizontal: space[2] },
