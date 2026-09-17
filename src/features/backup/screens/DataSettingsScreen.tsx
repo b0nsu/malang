@@ -33,8 +33,7 @@ async function readBackupFile(uri: string) {
 export default function DataSettingsScreen() {
   const face = useAppearance((state) => state.face);
   const appearance = useAppearance((state) => state.appearance);
-  const setFace = useAppearance((state) => state.setFace);
-  const setAppearance = useAppearance((state) => state.setAppearance);
+  const setCurrent = useAppearance((state) => state.setCurrent);
   const [busy, setBusy] = useState<'export' | 'import' | null>(null);
 
   const exportBackup = async () => {
@@ -73,8 +72,7 @@ export default function DataSettingsScreen() {
 
       const replaceDates = policy === 'replace' ? new Set(preview.collisions.map((entry) => entry.date)) : new Set<string>();
       await replaceEntries(backup.entries, replaceDates);
-      setFace(backup.currentFace);
-      setAppearance(backup.appearance);
+      setCurrent(backup.currentFace, backup.appearance);
       const replacedCount = policy === 'replace' ? preview.collisions.length : 0;
       Alert.alert('가져왔어요.', `새 기록 ${preview.additions.length}개${replacedCount ? `, 교체한 기록 ${replacedCount}개` : ''}와 현재 말랑이 외형을 불러왔어요.`);
     } catch (error) {
