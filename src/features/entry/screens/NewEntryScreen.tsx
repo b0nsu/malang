@@ -21,7 +21,8 @@ export default function NewEntryScreen() {
       const existing = await findEntry(date);
       if (existing) router.replace(`/entry/${date}` as never);
       else router.push('/entry/emotion');
-    } catch {
+    } catch (cause) {
+      console.error('Failed to check the entry date', cause);
       setError('기록을 확인하지 못했어요. 작성한 내용은 그대로 있어요. 다시 시도해 주세요.');
     } finally {
       pending.current = false;
