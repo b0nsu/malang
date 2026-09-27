@@ -49,17 +49,14 @@ function SceneContents(props: Props & { onReady: () => void; onFailure: () => vo
   return <FilamentView style={styles.canvas}><Camera cameraPosition={[0, 1, 4]} cameraTarget={[0, .9, 0]} /><DefaultLight /><ModelRenderer model={model}><ModelEffects {...props} model={model} /></ModelRenderer></FilamentView>;
 }
 
-export function FilamentMalang(props: Props) {
+export function FilamentMalang({ onFailure, ...props }: Props & { onFailure: () => void }) {
   const [ready, setReady] = useState(false);
-  const [failed, setFailed] = useState(false);
   const onReady = useCallback(() => setReady(true), []);
-  const onFailure = useCallback(() => setFailed(true), []);
   useEffect(() => {
-    if (ready || failed) return;
+    if (ready) return;
     const timer = setTimeout(onFailure, 15000);
     return () => clearTimeout(timer);
-  }, [ready, failed, onFailure]);
-  if (failed) return <StaticMalang {...props} />;
+  }, [ready, onFailure]);
   return <View style={styles.canvas}><FilamentScene fallback={<StaticMalang {...props} />}><SceneContents {...props} onReady={onReady} onFailure={onFailure} /></FilamentScene>{!ready ? <View pointerEvents="none" style={styles.loading}><StaticMalang {...props} /></View> : null}</View>;
 }
 const styles = StyleSheet.create({ canvas: { flex: 1 }, loading: { ...StyleSheet.absoluteFill } });
