@@ -1,5 +1,6 @@
 import { Children, type ReactElement } from 'react';
 import { BottomTabs } from './BottomTabs';
+import { Button } from './Button';
 import { ValuePicker } from '../entry-controls';
 import { layout } from '../tokens';
 
@@ -37,4 +38,12 @@ it('keeps the value optional and distinguishes zero from no value', () => {
   expect(onChange).toHaveBeenLastCalledWith(0);
   none.props.onPress();
   expect(onChange).toHaveBeenLastCalledWith(null);
+});
+
+it('shows the selected button state with text as well as color', () => {
+  const selected = Button({ label: '전체', selected: true });
+  const unselected = Button({ label: '주', selected: false });
+  expect(selected.props.accessibilityState.selected).toBe(true);
+  expect(selected.props.children.props.children).toBe('✓ 전체');
+  expect(unselected.props.children.props.children).toBe('주');
 });

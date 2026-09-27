@@ -3,7 +3,7 @@ import { color, layout, radius, space } from '../tokens';
 import { AppText } from './AppText';
 
 export function Button({ label, onPress, variant = 'primary', disabled = false, busy = false, selected, style }: { label: string; onPress?: () => void; variant?: 'primary' | 'subtle' | 'ghost'; disabled?: boolean; busy?: boolean; selected?: boolean; style?: StyleProp<ViewStyle> }) {
-  return <Pressable accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ disabled: disabled || busy, busy, selected }} disabled={disabled || busy} onPress={onPress} style={({ pressed }) => [styles.button, styles[variant], pressed && !disabled && styles.pressed, disabled && styles.disabled, style]}><AppText variant="label" tone="primary">{label}</AppText></Pressable>;
+  return <Pressable accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ disabled: disabled || busy, busy, selected }} disabled={disabled || busy} onPress={onPress} style={({ pressed }) => [styles.button, styles[variant], pressed && !disabled && styles.pressed, disabled && styles.disabled, style]}><AppText variant="label" tone="primary">{selected ? `✓ ${label}` : label}</AppText></Pressable>;
 }
 
 export function IconButton({ label, icon, onPress }: { label: string; icon: string; onPress?: () => void }) {
