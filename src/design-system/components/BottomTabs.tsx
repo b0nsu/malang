@@ -1,11 +1,15 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { color, layout, space } from '../tokens';
 import { AppText } from './AppText';
 
-export function BottomTabs({ active, onToday, onRecords, onStudio }: { active: 'today' | 'records' | 'studio'; onToday: () => void; onRecords: () => void; onStudio: () => void }) {
+type TabId = 'today' | 'records' | 'studio';
+
+export function BottomTabs({ active, onToday, onRecords, onStudio, onLongPress }: { active: TabId; onToday: () => void; onRecords: () => void; onStudio: () => void; onLongPress?: (tab: TabId) => void }) {
+  const insets = useSafeAreaInsets();
   const tabs = [{ id: 'today' as const, label: '오늘', fn: onToday }, { id: 'records' as const, label: '기록', fn: onRecords }, { id: 'studio' as const, label: '말랑이', fn: onStudio }];
-  return <View style={styles.tabs}>{tabs.map((tab) => { const selected = active === tab.id; return <Pressable key={tab.id} accessibilityRole="tab" accessibilityState={{ selected }} onPress={tab.fn} style={styles.tab}><TabIcon name={tab.id} selected={selected} /><AppText variant="caption" tone={selected ? 'primary' : 'tertiary'}>{tab.label}</AppText></Pressable>; })}</View>;
+  return <View style={[styles.tabs, { minHeight: layout.tabBarHeight + insets.bottom, paddingBottom: Math.max(space[2], insets.bottom), paddingLeft: insets.left, paddingRight: insets.right }]}>{tabs.map((tab) => { const selected = active === tab.id; return <Pressable key={tab.id} accessibilityRole="tab" accessibilityLabel={tab.label} accessibilityState={{ selected }} onPress={tab.fn} onLongPress={() => onLongPress?.(tab.id)} style={styles.tab}><TabIcon name={tab.id} selected={selected} /><AppText variant="caption" tone={selected ? 'primary' : 'tertiary'}>{tab.label}</AppText></Pressable>; })}</View>;
 }
 
 function TabIcon({ name, selected }: { name: 'today' | 'records' | 'studio'; selected: boolean }) {

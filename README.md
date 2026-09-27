@@ -18,6 +18,8 @@ npm run ios
 npm run android
 ```
 
+iOS 시뮬레이터 빌드에도 코드 서명이 필요합니다. `expo-secure-store`가 기록 DB의 암호키를 iOS Keychain에 보관하므로, `CODE_SIGNING_ALLOWED=NO`로 빌드하면 날짜 확인 단계에서 Keychain 권한 오류가 나고 감정 선택으로 진행할 수 없습니다. `npm run ios`를 사용하거나 Xcode에서 시뮬레이터용 로컬 서명을 켜고 빌드하세요.
+
 ## 검사
 
 ```bash
